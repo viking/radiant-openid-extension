@@ -7,9 +7,8 @@ class OpenidExtension < Radiant::Extension
   url "http://yourwebsite.com/openid"
 
   define_routes do |map|
-    map.namespace :admin do |admin|
-      admin.oid_login 'openid/login', :controller => 'openid', :action => 'login'
-    end
+    p map.instance_variable_get("@set")
+    map.oid_login 'admin/openid/login', :controller => 'admin/openid', :action => 'login'
   end
 
   def activate

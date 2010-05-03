@@ -9,9 +9,11 @@ class Admin::OpenidController < ApplicationController
             redirect_to welcome_url
           else
             flash.now[:error] = "Invalid identity."
+            render :template => 'admin/welcome/login'
           end
         else
           flash.now[:error] = "Open ID authentication failed."
+          render :template => 'admin/welcome/login'
         end
       end
     end
