@@ -15,6 +15,7 @@ class OpenidExtension < Radiant::Extension
   def activate
     # admin.tabs.add "Openid", "/admin/openid", :after => "Layouts", :visibility => [:all]
     OpenIdAuthentication.store = :file
+    admin.users.edit.add(:form, "edit_identity_url", :after => "edit_password")
   end
 
   def deactivate
