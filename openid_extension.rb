@@ -3,21 +3,22 @@
 
 class OpenidExtension < Radiant::Extension
   version "1.0"
-  description "Describe your extension here"
+  description "Provides Open ID logins for Radiant"
   url "http://yourwebsite.com/openid"
-  
-  # define_routes do |map|
-  #   map.namespace :admin, :member => { :remove => :get } do |admin|
-  #     admin.resources :openid
-  #   end
-  # end
-  
+
+  define_routes do |map|
+    map.namespace :admin do |admin|
+      admin.oid_login 'openid/login', :controller => 'openid', :action => 'login'
+    end
+  end
+
   def activate
     # admin.tabs.add "Openid", "/admin/openid", :after => "Layouts", :visibility => [:all]
+    OpenIdAuthentication.store = :file
   end
-  
+
   def deactivate
     # admin.tabs.remove "Openid"
   end
-  
+
 end
