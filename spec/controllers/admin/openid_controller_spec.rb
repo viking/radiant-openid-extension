@@ -9,16 +9,20 @@ describe Admin::OpenidController do
   end
 
   describe "POST 'login" do
+    before(:each) do
+      @identity = 'http://example.com/foo'
+      @params = {:openid_identifier => @identity}
+      @result = stub('open id result')
+      @controller.should_receive(:authenticate_with_open_id).and_yield(@result, @identity)
+    end
+
     describe "with successful Open ID authentication" do
       before(:each) do
-        @identity = 'http://example.com/foo'
-        @params = {:openid_identifier => @identity}
-        @result = stub('open id result', :successful? => true)
-        @controller.should_receive(:authenticate_with_open_id).and_yield(@result, @identity)
-        @user = create_user('Open ID User', :identity_url => @identity)
+        @result.stub!(:successful?).and_return(true)
       end
 
       it "should log in valid user" do
+        @user = create_user('Open ID User', :identity_url => @identity)
         @controller.should_receive(:current_user=).with(@user).and_return(@user)
 
         post 'login', @params
@@ -26,7 +30,6 @@ describe Admin::OpenidController do
       end
 
       it "should not log in non-existent user" do
-        @identity.sub!(/foo$/, "bar")
         @controller.should_receive(:current_user=).with(nil).and_return(nil)
 
         post 'login', @params
@@ -34,5 +37,15 @@ describe Admin::OpenidController do
       end
     end
 
+    describe "non-successful Open ID authentication" do
+      before(:each) do
+        @result.stub!(:successful?).and_return(false)
+      end
+
+      it "should re-display view" do
+        post 'login', @params
+        response.should be_success
+      end
+    end
   end
 end

@@ -10,6 +10,8 @@ class Admin::OpenidController < ApplicationController
           else
             flash.now[:error] = "Invalid identity."
           end
+        else
+          flash.now[:error] = "Open ID authentication failed."
         end
       end
     end
