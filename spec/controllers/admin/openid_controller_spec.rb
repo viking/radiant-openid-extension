@@ -3,12 +3,22 @@ require File.dirname(__FILE__) + '/../../spec_helper'
 describe Admin::OpenidController do
   dataset :users
 
-  it "GET 'login' should be successful" do
-    get 'login'
-    response.should be_success
+  describe "GET 'login'" do
+    it "should be successful" do
+      get 'login'
+      response.should be_success
+    end
+
+    it "should automatically redirect to OP" do
+      Radiant::Config['openid.autoauth'] = "https://example.com"
+
+      result = stub('open id result')
+      @controller.should_receive(:authenticate_with_open_id)
+      get 'login'
+    end
   end
 
-  describe "POST 'login" do
+  describe "POST 'login'" do
     before(:each) do
       @identity = 'http://example.com/foo'
       @params = {:openid_identifier => @identity}
@@ -45,6 +55,34 @@ describe Admin::OpenidController do
       it "should re-display view" do
         post 'login', @params
         response.should be_success
+      end
+    end
+  end
+
+  describe "GET 'logout'" do
+    describe "with a logged-in user" do
+      before do
+        login_as :admin
+      end
+
+      it "should clear the current user and redirect on logout" do
+        controller.should_receive(:current_user=).with(nil)
+        get :logout
+        response.should be_redirect
+        response.should redirect_to(root_url)
+      end
+
+      it "should forget user on logout" do
+        controller.send(:current_user).should_receive(:forget_me)
+        get :logout
+      end
+    end
+
+    describe "without a user" do
+      it "should gracefully handle logout" do
+        controller.stub!(:current_member).and_return(nil)
+        get :logout
+        response.should redirect_to(root_url)
       end
     end
   end

@@ -7,7 +7,8 @@ class OpenidExtension < Radiant::Extension
   url "http://github.com/viking/radiant-openid-extension"
 
   define_routes do |map|
-    map.oid_login 'admin/openid/login', :controller => 'admin/openid', :action => 'login'
+    map.oid_login  'admin/openid/login',  :controller => 'admin/openid', :action => 'login'
+    map.oid_logout 'admin/openid/logout', :controller => 'admin/openid', :action => 'logout'
   end
 
   def activate

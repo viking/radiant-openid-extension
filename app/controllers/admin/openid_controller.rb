@@ -2,6 +2,9 @@ class Admin::OpenidController < ApplicationController
   no_login_required
 
   def login
+    if !using_open_id? && (identity_url = Radiant::Config['openid.autoauth'])
+      params['openid_identifier'] = identity_url
+    end
     if using_open_id?
       authenticate_with_open_id do |result, identity_url|
         if result.successful?
@@ -17,5 +20,12 @@ class Admin::OpenidController < ApplicationController
         end
       end
     end
+  end
+
+  def logout
+    cookies[:session_token] = { :expires => 1.day.ago }
+    self.current_user.forget_me if self.current_user
+    self.current_user = nil
+    redirect_to root_url
   end
 end

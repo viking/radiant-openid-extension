@@ -9,5 +9,9 @@ describe "Openid::ApplicationControllerExtensions", :type => :controller do
     it "#login_url" do
       login_url.should == oid_login_url
     end
+
+    it "#logout_url" do
+      logout_url.should == oid_logout_url
+    end
   end
 end
